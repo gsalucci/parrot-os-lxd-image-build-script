@@ -8,7 +8,7 @@ defaultConfig () {
     config+=([parrot_main_url]="https://raw.githubusercontent.com/ParrotSec/debootstrap/master/scripts/parrot")
     config+=([parrot_rolling_url]="https://raw.githubusercontent.com/ParrotSec/debootstrap/master/scripts/rolling")
     config+=([parrot_mirror_url]="https://mirror.parrot.sh/mirrors/parrot/")
-    config+=([debootstrap_script_path]="/usr/share/debootstrap/scripts/")
+    config+=([debootstrap_script_path]="/usr/share/debootstrap/scripts")
     config+=([target_arch]="amd64")
     config+=([os_name]="parrot")
     config+=([os_release]="rolling")
@@ -21,12 +21,11 @@ clean () {
     echo "Deleting ${config[build_dir]}"
     sudo rm -Irf ${config[build_dir]}
     echo "Deleting debootstrap parrot scripts at ${config[debootstrap_script_path]}"
-    cd ${config[debootstrap_script_path]}
-    sudo rm parrot rolling
+    sudo rm ${config[debootstrap_script_path]}/parrot ${config[debootstrap_script_path]}/rolling
     echo "Deleting rootfs archive"
     sudo rm -I $(pwd)/rootfs.tar.gz
     echo "Deleting metadata"
-    rm $(pwd)/metadata.yml
+    rm $(pwd)/metadata.yaml
     rm $(pwd)/metadata.tar.gz
     mkdir ${config[build_dir]}
 }
