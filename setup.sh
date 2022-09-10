@@ -41,6 +41,13 @@ _installPrerequisites () {
     sudo apt install -y debootstrap wget
 }
 
+_exitIfFailed () {
+    local exit_code=$?
+	if [ $exit_code -ne 0 ]; then
+        exit $exit_code
+    fi
+}
+
 # builds the rootfs
 build () {
     _installPrerequisites
@@ -59,6 +66,14 @@ build () {
 
     # launch debootstrap targetting build dir
     sudo debootstrap --arch ${config[target_arch]} parrot ${config[build_dir]} ${config[parrot_mirror_url]}
+    _exitIfFailed
+
+    #enable dhcp for eth0
+    cat <<- EOF > ${config[build_dir]}/etc/network/interfaces.d/eth0.dhcp.conf
+    auto eth0
+    allow-hotplug eth0
+    iface eth0 inet dhcp
+EOF
 }
 
 
@@ -89,16 +104,9 @@ import () {
 
 full () {
 	build
-	# Exit if debootstrap failed
-	local exit_code=$?
-	if [ $exit_code -ne 0 ]; then
-        exit $exit_code
-    fi
+	_exitIfFailed
     package
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        exit $exit_code
-    fi
+    _exitIfFailed
     import
 }
 
